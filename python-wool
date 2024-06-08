@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+print("Using Python-Wool")
+
+import sys
+import subprocess
+import os
+
+def find_venv(parts):
+    parts.append('venv')
+    path = os.sep.join(parts)
+    print(path)
+    if not os.path.exists(path):
+        if len(parts) > 2:
+            return find_venv(parts[:-2])
+        return False
+    python_v = os.listdir(path+os.sep+'lib')[0]
+    site_packages = os.path.join(path, 'lib', python_v, 'site-packages')
+    os.environ['PYTHONPATH'] = site_packages
+    subprocess.run([os.path.join(path, 'bin', 'python'), *sys.argv[1:]])
+    return True
+
+cwd = os.getcwd()
+parts = cwd.split(os.sep)
+
+if not find_venv(parts):
+    subprocess.run(['python', *sys.argv[1:]])
