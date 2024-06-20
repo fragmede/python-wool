@@ -19,9 +19,14 @@ def find_venv(parts):
     ran = subprocess.run([os.path.join(path, 'bin', 'python'), *sys.argv[1:]])
     sys.exit(ran.returncode)
 
+# Try from the scripts path.
+find_venv(os.path.expanduser(sys.argv[1]).split(os.sep))
+
+# Try from our path
 cwd = os.getcwd()
 parts = cwd.split(os.sep)
 
 find_venv(parts)
-find_venv(os.path.expanduser(sys.argv[1]).split(os.sep))
+
+# try the system one
 subprocess.run(['python', *sys.argv[1:]])
