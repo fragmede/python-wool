@@ -16,11 +16,12 @@ def find_venv(parts):
     python_v = os.listdir(path+os.sep+'lib')[0]
     site_packages = os.path.join(path, 'lib', python_v, 'site-packages')
     os.environ['PYTHONPATH'] = site_packages
-    subprocess.run([os.path.join(path, 'bin', 'python'), *sys.argv[1:]])
-    return True
+    ran = subprocess.run([os.path.join(path, 'bin', 'python'), *sys.argv[1:]])
+    sys.exit(ran.returncode)
 
 cwd = os.getcwd()
 parts = cwd.split(os.sep)
 
-if not find_venv(parts):
-    subprocess.run(['python', *sys.argv[1:]])
+find_venv(parts)
+find_venv(os.path.expanduser(sys.argv[1]).split(os.sep))
+subprocess.run(['python', *sys.argv[1:]])
