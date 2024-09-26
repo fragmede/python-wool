@@ -5,8 +5,8 @@ import sys
 import subprocess
 import os
 
-def find_venv(parts):
-    parts.append('venv')
+def find_venv(parts, dir_name):
+    parts.append(dir_name)
     path = os.sep.join(parts)
     print(path)
     if not os.path.exists(path):
@@ -15,17 +15,18 @@ def find_venv(parts):
         return False
     python_v = os.listdir(path+os.sep+'lib')[0]
     site_packages = os.path.join(path, 'lib', python_v, 'site-packages')
+    print("site pack {}".format(site_packages))
     os.environ['PYTHONPATH'] = site_packages
     ran = subprocess.run([os.path.join(path, 'bin', 'python'), *sys.argv[1:]])
     sys.exit(ran.returncode)
 
 # Try from the scripts path.
-find_venv(os.path.expanduser(sys.argv[1]).split(os.sep))
+find_venv(os.path.expanduser(sys.argv[1]).split(os.sep), 'venv')
+find_venv(os.path.expanduser(sys.argv[1]).split(os.sep), '.venv')
 
 # Try from our path
 cwd = os.getcwd()
 parts = cwd.split(os.sep)
-
 find_venv(parts)
 
 # try the system one
