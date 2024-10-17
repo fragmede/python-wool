@@ -5,29 +5,39 @@ import sys
 import subprocess
 import os
 
-def find_venv(parts, dir_name):
-    parts.append(dir_name)
-    path = os.sep.join(parts)
-    print(path)
+if len(sys.argv) == 1:
+    os.execvp("python", ["python"])
+
+def find_venv_named(parts, name):
+    p_copy = parts.copy()
+    p_copy.append(name)
+    path = os.sep.join(p_copy)
+    print('  Searched {}'.format(path))
     if not os.path.exists(path):
         if len(parts) > 2:
-            return find_venv(parts[:-2])
+            return find_venv_named(parts[:-1], name)
         return False
     python_v = os.listdir(path+os.sep+'lib')[0]
     site_packages = os.path.join(path, 'lib', python_v, 'site-packages')
-    print("site pack {}".format(site_packages))
+    print("  Checking site pack {}".format(site_packages))
     os.environ['PYTHONPATH'] = site_packages
-    ran = subprocess.run([os.path.join(path, 'bin', 'python'), *sys.argv[1:]])
-    sys.exit(ran.returncode)
+    os.execvp("python", sys.argv)
 
-# Try from the scripts path.
-find_venv(os.path.expanduser(sys.argv[1]).split(os.sep), 'venv')
-find_venv(os.path.expanduser(sys.argv[1]).split(os.sep), '.venv')
+def find_venv_all_names(path):
+    find_venv_named(path, 'venv')
+    find_venv_named(path, '.venv')
+    find_venv_named(path, 'env')
+    find_venv_named(path, 'virtualenv')
+    find_venv_named(path, '.virtualenv')
 
-# Try from our path
+# Look in the program's directory.
+find_venv_all_names(os.path.expanduser(sys.argv[1]).split(os.sep))
+
+# Check current directory for one as well.
 cwd = os.getcwd()
 parts = cwd.split(os.sep)
-find_venv(parts)
+find_venv_all_names(parts)
 
 # try the system one
-subprocess.run(['python', *sys.argv[1:]])
+print('  Python-wool did not find a venv, running normally.')
+os.execvp("python", sys.argv)
