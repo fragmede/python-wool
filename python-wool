@@ -9,12 +9,9 @@ if len(sys.argv) == 1:
     os.execvp("python", ["python"])
 
 def is_venv(path):
-    return os.path.isfile(os.path.join(path, 'pyvenv.cfg'))
+    return 'activate' in os.listdir(os.path.join(path, 'bin'))
 
-def find_venv_named(parts, name):
-    p_copy = parts.copy()
-    p_copy.append(name)
-    path = os.sep.join(p_copy)
+def try_venv(path):
     print('  Searched {}'.format(path))
     if not os.path.exists(path):
         if len(parts) > 2:
@@ -28,7 +25,17 @@ def find_venv_named(parts, name):
         os.execvp("python", sys.argv)
     return False
 
+def find_venv_unnamed(parts):
+    p_copy = parts.copy()[:-2]
+    try_venv(os.sep.join(p_copy))
+
+def find_venv_named(parts, name):
+    p_copy = parts.copy()
+    p_copy.append(name)
+    try_venv(os.sep.join(p_copy))
+
 def find_venv_all_names(path):
+    find_venv_unnamed(path)
     find_venv_named(path, 'venv')
     find_venv_named(path, '.venv')
     find_venv_named(path, 'env')
