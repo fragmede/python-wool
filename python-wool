@@ -8,6 +8,9 @@ import os
 if len(sys.argv) == 1:
     os.execvp("python", ["python"])
 
+def is_venv(path):
+    return os.path.isfile(os.path.join(path, 'pyvenv.cfg'))
+
 def find_venv_named(parts, name):
     p_copy = parts.copy()
     p_copy.append(name)
@@ -17,11 +20,13 @@ def find_venv_named(parts, name):
         if len(parts) > 2:
             return find_venv_named(parts[:-1], name)
         return False
-    python_v = os.listdir(path+os.sep+'lib')[0]
-    site_packages = os.path.join(path, 'lib', python_v, 'site-packages')
-    print("  Checking site pack {}".format(site_packages))
-    os.environ['PYTHONPATH'] = site_packages
-    os.execvp("python", sys.argv)
+    if is_venv(path):
+        print("  Found venv at {}".format(path))
+        site_packages = os.path.join(path, 'lib', os.listdir(path+os.sep+'lib')[0], 'site-packages')
+        print("  Using site-packages: {}".format(site_packages))
+        os.environ['PYTHONPATH'] = site_packages
+        os.execvp("python", sys.argv)
+    return False
 
 def find_venv_all_names(path):
     find_venv_named(path, 'venv')
@@ -39,5 +44,5 @@ parts = cwd.split(os.sep)
 find_venv_all_names(parts)
 
 # try the system one
-print('  Python-wool did not find a venv, running normally.')
+print('  Python-wool did not find a venv (no pyvenv.cfg found), running normally.')
 os.execvp("python", sys.argv)
