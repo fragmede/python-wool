@@ -13,10 +13,6 @@ def is_venv(path):
 
 def try_venv(path):
     print('  Searched {}'.format(path))
-    if not os.path.exists(path):
-        if len(parts) > 2:
-            return find_venv_named(parts[:-1], name)
-        return False
     if is_venv(path):
         print("  Found venv at {}".format(path))
         site_packages = os.path.join(path, 'lib', os.listdir(path+os.sep+'lib')[0], 'site-packages')
