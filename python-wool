@@ -9,7 +9,10 @@ if len(sys.argv) == 1:
     os.execvp("python", ["python"])
 
 def is_venv(path):
-    return 'activate' in os.listdir(os.path.join(path, 'bin'))
+    try:
+        return 'activate' in os.listdir(os.path.join(path, 'bin'))
+    except FileNotFoundError:
+        return False
 
 def try_venv(path):
     print('  Searched {}'.format(path))
