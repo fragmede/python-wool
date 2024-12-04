@@ -11,7 +11,7 @@ if len(sys.argv) == 1:
 def is_venv(path):
     try:
         return 'activate' in os.listdir(os.path.join(path, 'bin'))
-    except FileNotFoundError:
+    except (FileNotFoundError, NotADirectoryError):
         return False
 
 def try_venv(path):
